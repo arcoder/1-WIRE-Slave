@@ -1,0 +1,27 @@
+ISim log file
+Running: C:\Users\alberto\Documents\Progetti\SUBPROJECT\SEARCH_ROM\SEARCH_ROM_BENCH_isim_beh.exe -intstyle ise -gui -tclbatch isim.cmd -wdb C:/Users/alberto/Documents/Progetti/SUBPROJECT/SEARCH_ROM/SEARCH_ROM_BENCH_isim_beh.wdb 
+ISim P.49d (signature 0x7708f090)
+This is a Full version of ISim.
+Time resolution is 1 ps
+# onerror resume
+# wave add /
+# run 1000 ns
+Simulator is doing circuit initialization process.
+Finished circuit initialization process.
+# restart
+# run all
+Simulator is doing circuit initialization process.
+Finished circuit initialization process.
+Stopped at time : 94540200 ns : File "C:/Users/alberto/Documents/Progetti/SUBPROJECT/SEARCH_ROM/SEARCH_ROM_BENCH.vhd" Line 78
+ISim P.49d (signature 0x7708f090)
+This is a Full version of ISim.
+# run 1000 ns
+Simulator is doing circuit initialization process.
+Finished circuit initialization process.
+# restart
+# run all
+Simulator is doing circuit initialization process.
+Finished circuit initialization process.
+Stopped at time : 69456090 ns : File "C:/Users/alberto/Documents/Progetti/SUBPROJECT/SEARCH_ROM/Reader.vhd" Line 129
+# run all
+Stopped at time : 89921340 ns : File "C:/Users/alberto/Documents/Progetti/SUBPROJECT/SEARCH_ROM/SEARCH_ROM_BENCH.vhd" Line 78

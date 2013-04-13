@@ -1,0 +1,8 @@
+INTSTYLE=ise
+INFILE=C:\Users\alberto\Documents\Progetti\SUBPROJECT\SEARCH_ROM\Interface.ncd
+OUTFILE=C:\Users\alberto\Documents\Progetti\SUBPROJECT\SEARCH_ROM\Interface.bit
+FAMILY=Spartan3E
+PART=xc3s500e-4fg320
+WORKINGDIR=C:\Users\alberto\Documents\Progetti\SUBPROJECT\SEARCH_ROM
+LICENSE=WebPack
+USER_INFO=__0_0_0

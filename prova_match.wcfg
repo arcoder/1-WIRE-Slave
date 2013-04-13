@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="C:/Users/alberto/Documents/Progetti/SUBPROJECT/SEARCH_ROM/MATCH_ROM_BENCH_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="match_rom_bench" />
+            <top_module name="std_logic_1164" />
+            <top_module name="std_logic_arith" />
+            <top_module name="std_logic_textio" />
+            <top_module name="std_logic_unsigned" />
+            <top_module name="textio" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="18" />
+   <wvobject fp_name="/match_rom_bench/reset" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/match_rom_bench/clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/match_rom_bench/bus_inout" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">bus_inout</obj_property>
+      <obj_property name="ObjectShortName">bus_inout</obj_property>
+   </wvobject>
+   <wvobject fp_name="/match_rom_bench/data" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/match_rom_bench/uut/U5/data" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/match_rom_bench/uut/U5/compare_sg1" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">compare_sg1[3:0]</obj_property>
+      <obj_property name="ObjectShortName">compare_sg1[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/match_rom_bench/uut/U5/compare_sg2" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">compare_sg2[3:0]</obj_property>
+      <obj_property name="ObjectShortName">compare_sg2[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/match_rom_bench/uut/U5/addra" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">addra[3:0]</obj_property>
+      <obj_property name="ObjectShortName">addra[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/match_rom_bench/uut/U5/romdata" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">romdata[3:0]</obj_property>
+      <obj_property name="ObjectShortName">romdata[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/match_rom_bench/uut/U5/present_state" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">present_state</obj_property>
+      <obj_property name="ObjectShortName">present_state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/match_rom_bench/uut/U5/next_state" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">next_state</obj_property>
+      <obj_property name="ObjectShortName">next_state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/match_rom_bench/uut/U5/cursor" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">cursor[3:0]</obj_property>
+      <obj_property name="ObjectShortName">cursor[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/match_rom_bench/uut/U5/load1" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">load1</obj_property>
+      <obj_property name="ObjectShortName">load1</obj_property>
+   </wvobject>
+   <wvobject fp_name="/match_rom_bench/uut/U5/load2" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">load2</obj_property>
+      <obj_property name="ObjectShortName">load2</obj_property>
+   </wvobject>
+   <wvobject fp_name="/match_rom_bench/uut/U5/read_byte_ack" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">read_byte_ack</obj_property>
+      <obj_property name="ObjectShortName">read_byte_ack</obj_property>
+   </wvobject>
+   <wvobject fp_name="/match_rom_bench/uut/U5/read_enable" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">read_enable</obj_property>
+      <obj_property name="ObjectShortName">read_enable</obj_property>
+   </wvobject>
+   <wvobject fp_name="/match_rom_bench/uut/U5/cursor_reset" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">cursor_reset</obj_property>
+      <obj_property name="ObjectShortName">cursor_reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/match_rom_bench/uut/U5/cursor_enable" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">cursor_enable</obj_property>
+      <obj_property name="ObjectShortName">cursor_enable</obj_property>
+   </wvobject>
+</wave_config>

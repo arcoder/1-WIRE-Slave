@@ -1,0 +1,1 @@
+-intstyle "ise" -incremental -o "C:/Users/alberto/Documents/Progetti/SUBPROJECT/SEARCH_ROM/SEARCH_ROM_BENCH_isim_beh.exe" -prj "C:/Users/alberto/Documents/Progetti/SUBPROJECT/SEARCH_ROM/SEARCH_ROM_BENCH_beh.prj" "work.SEARCH_ROM_BENCH" 

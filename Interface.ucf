@@ -1,0 +1,19 @@
+
+
+NET "CLK" LOC = C9;
+NET "RESET" LOC = D18;
+NET "BUS_INOUT" LOC = D7;
+NET "DATA[7]" LOC = F12;
+NET "DATA[6]" LOC = E12;
+NET "DATA[5]" LOC = E11;
+NET "DATA[4]" LOC = F11;
+NET "DATA[3]" LOC = C11;
+NET "DATA[2]" LOC = D11;
+NET "DATA[1]" LOC = E9;
+NET "DATA[0]" LOC = F9;
+
+# PlanAhead Generated physical constraints 
+
+#NET "SENSOR_RE" LOC = L13;
+
+

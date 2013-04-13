@@ -1,0 +1,10 @@
+Command line:
+   SEARCH_ROM_BENCH_isim_beh.exe
+     -simmode  gui
+     -simrunnum  0
+     -socket  50793
+
+Wed Apr 10 21:08:42 2013
+
+
+ Elaboration Time: 0.093601 sec
