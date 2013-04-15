@@ -1,8 +1,6 @@
 ----------------------------------------------------------------------------------
 -- Company: 
--- Engineer: 
--- 
--- Create Date:    11:07:31 11/25/2012 
+-- Engineer: Alberto Ruffo
 -- Design Name: 
 -- Module Name:    Sequencer - Behavioral 
 -- Project Name: 
@@ -21,16 +19,6 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.all;
 
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
 entity Sequencer is port(
 
 	RESET_ACK: in std_logic;	
@@ -41,15 +29,15 @@ entity Sequencer is port(
 	DATA_OUT:out std_logic_vector(7 downto 0);
 	CLK: in std_logic;
 	RESET: in std_logic;
---	OK_READ: out std_logic;
 	READ_ENABLE:out std_logic;
 	READ_BIT_ACK: in std_logic;
 	WRITTEN_BIT_ACK: in std_logic;
 	WRITE_ENABLE: out std_logic;
 	ADDRA: out std_logic_vector(3 downto 0 );
 	ROMDATA: in std_logic_vector(3 downto 0 );
-	--SENSOR_DATA: in std_logic_vector(3 downto 0 );
-	SHIFT_CONTENT: in std_logic_vector(7 downto 0 )
+	SENSOR_DATA: out std_logic_vector(7 downto 0 );
+	SHIFT_CONTENT: in std_logic_vector(7 downto 0 );
+	RE: in std_logic
 	
 );
 end Sequencer;
@@ -57,7 +45,7 @@ end Sequencer;
 architecture Behavioral of Sequencer is
 
 	type STATUS is (
-		IDLE, TRANS, READ_CMD, 
+		IDLE, TRANS, READ_CMD, SENSOR_CMD,
 		WRITE_BYTE, LOAD, SEND_BIT_ROM, LOAD_BIT_ROM, 
 		READ_BIT_FROM_MASTER, NEXT_ROW, WAIT_CLK_FOR_MEM ,
 		MATCH_ROM_READ, LOAD_FIRST_4BIT, LOAD_SECOND_4BIT, COMPARE, CHECK_CODE, INTERMEDIATE, REBRANCHING
@@ -75,10 +63,6 @@ begin
 
 ADDRA <= cursor;
 
---DATA_OUT <= DATA;
-
-
--- Output register
 output: process( CLK )
 begin
 	if( CLK'event and CLK = '1' ) then
@@ -94,16 +78,13 @@ begin
 if RESET = '1' then
 	count_ack_bit <= (others => '0');
 elsif CLK'event and CLK = '1' then
---	if WRITE_ENABLE = '1' then
-		if count_ack_bit = "10" then 
-			count_ack_bit <= (others => '0');
-		else
-			if count_enable = '1' then
-				count_ack_bit <= count_ack_bit + 1;
-			end if;
+	if count_ack_bit = "10" then 
+		count_ack_bit <= (others => '0');
+	else
+		if count_enable = '1' then
+			count_ack_bit <= count_ack_bit + 1;
 		end if;
-		--count <= (others => '0');
---	end if;
+	end if;
 end if;
 end process;
 
@@ -112,16 +93,13 @@ begin
 if RESET = '1' then
 	count_read <= (others => '0');
 elsif CLK'event and CLK = '1' then
---	if WRITE_ENABLE = '1' then
-		if count_read = "100" then 
-			count_read <= (others => '0');
-		else
-			if count_read_enable = '1' then
-				count_read <= count_read + 1;
-			end if;
+	if count_read = "100" then 
+		count_read <= (others => '0');
+	else
+		if count_read_enable = '1' then
+			count_read <= count_read + 1;
 		end if;
-		--count <= (others => '0');
---	end if;
+	end if;
 end if;
 end process;
 
@@ -132,16 +110,13 @@ begin
 if RESET = '1' then
 	cursor <= (others => '0');
 elsif CLK'event and CLK = '1' then
---	if WRITE_ENABLE = '1' then
-			if cursor_enable = '1' then
-				cursor <= cursor + 1;
-			else
-				if cursor_reset = '1' then
-					cursor <= (others => '0');
-				end if;
-			end if;
-		--count <= (others => '0');
---	end if;
+	if cursor_enable = '1' then
+		cursor <= cursor + 1;
+	else
+		if cursor_reset = '1' then
+			cursor <= (others => '0');
+		end if;
+	end if;
 end if;
 end process;
 
@@ -168,7 +143,7 @@ elsif CLK'event and CLK = '1' then
 end if;
 end process;
 
-main_state_machine: process(  RESET_ACK, PRESENCE_ACK, 
+main_state_machine: process(  RESET_ACK, PRESENCE_ACK, RE,
 										READ_BYTE_ACK, DATA, 
 										PRESENT_STATE, READ_BIT_ACK, 	
 										WRITTEN_BIT_ACK, ROMDATA, 
@@ -183,16 +158,8 @@ case PRESENT_STATE is
 		else
 		  NEXT_STATE <= IDLE;
 		end if;
-		--NEXT_STATE <= IDLE;
-	--	if PRESENCE_ACK = '1' then
-	
-	--			NEXT_STATE <= READ_CMD;	
-	--	else
-	--			NEXT_STATE <= IDLE;
-	--	end if;
 		
 		DATA_OUT <= SHIFT_CONTENT;
-		--DATA_OUT <= DATA;
 		READ_ENABLE <= '0';
 		WRITE_ENABLE <= '0';
 		cursor_enable <= '0';
@@ -201,26 +168,23 @@ case PRESENT_STATE is
 		cursor_reset <= '0';
 		load1 <= '0';
 		load2 <= '0';
+		SENSOR_DATA <= "ZZZZZZZZ";
 		
 when READ_CMD =>
---	if RESET_ACK = '1' then
---		NEXT_STATE <= READ_CMD;
---		READ_ENABLE <= '0';
---		OK_READ <= '0';
---	else
+
 		if RESET_ACK = '0' then
 			if READ_BYTE_ACK = '0' then
 				READ_ENABLE <= '1';
 				NEXT_STATE <= READ_CMD;
---				OK_READ <= '0';
 			else
-
 				-- IF DATA IS SEARCH ROM COMMAND
 				if DATA = "11110000" then
 				--	DATA_OUT <= "00011000";
 					NEXT_STATE <= LOAD_BIT_ROM;
 				elsif DATA = "01010101" then
 					NEXT_STATE <= MATCH_ROM_READ;
+				elsif DATA = "00001111" then
+					NEXT_STATE <= SENSOR_CMD;
 				else
 					NEXT_STATE <= READ_CMD;
 				end if;
@@ -239,20 +203,36 @@ when READ_CMD =>
 		load1 <= '0';
 		load2 <= '0';
 		DATA_OUT <= SHIFT_CONTENT;
-		--DATA_OUT  <= DATA; -- <= "0011" & cursor;
-	--end if;
-	
---	when LOAD =>
---		next_state <= LOAD;
---		DATA_OUT <= DATA;
---		READ_ENABLE <= '0';
---		WRITE_ENABLE <= '0';
---		cursor_enable <= '0';
---		count_enable <= '0';
---		count_read_enable <= '0';
---		cursor_reset <= '1';
---		load1 <= '0';
---		load2 <= '0';
+		SENSOR_DATA <= "ZZZZZZZZ";
+		
+when SENSOR_CMD =>
+
+		if RESET_ACK = '0' then
+			if READ_BYTE_ACK = '0' then
+				READ_ENABLE <= '1';
+				NEXT_STATE <= SENSOR_CMD;
+			else			
+				NEXT_STATE <= SENSOR_CMD;
+				READ_ENABLE <= '0';
+			end if;
+		else
+			NEXT_STATE <= IDLE;
+			READ_ENABLE <= '0';
+		end if;
+		WRITE_ENABLE <= '0';
+		cursor_enable <= '0';
+		count_enable <= '0';
+		count_read_enable <= '0';
+		cursor_reset <= '1';
+		load1 <= '0';
+		load2 <= '0';
+		if RE = '1' then
+			SENSOR_DATA <= DATA;
+		else
+			SENSOR_DATA <= "ZZZZZZZZ";
+		end if;
+		DATA_OUT <= SHIFT_CONTENT;
+
 ------------------------------------ MATCH ROM START -----------------------------------------------
 
 	when MATCH_ROM_READ =>
@@ -272,10 +252,9 @@ when READ_CMD =>
 		count_enable <= '0';
 		count_read_enable <= '0';
 		DATA_OUT <= SHIFT_CONTENT;
-		--DATA_OUT <= "0001" & cursor;
-		--DATA_OUT <= DATA;
 		load1 <= '0';
 		load2 <= '0';
+		SENSOR_DATA <= "ZZZZZZZZ";
 	
 	when LOAD_FIRST_4BIT =>
 		-- CARICO i primi 4 bit della rom, a destra, per poi caricare i secondi a sinistra
@@ -290,14 +269,14 @@ when READ_CMD =>
 		count_enable <= '0';
 		count_read_enable <= '0';
 		DATA_OUT <= SHIFT_CONTENT;
-		--DATA_OUT <= "0010" & cursor;
 		DATA_OUT <= DATA;
+		SENSOR_DATA <= "ZZZZZZZZ";
+		
 	when INTERMEDIATE =>
-		-- CARICO i primi 4 bit della rom, a destra, per poi caricare i secondi a sinistra
+
 		load1 <= '0';
 		load2 <= '0';
-		--compare(7 downto 4 ) <= (others => '0');
-		--DATA_OUT(7 downto 4) <= SHIFT_CONTENT(7 downto 4);
+
 		NEXT_STATE <= LOAD_SECOND_4BIT;
 		
 		READ_ENABLE <= '0';
@@ -308,13 +287,12 @@ when READ_CMD =>
 		count_read_enable <= '0';
 		DATA_OUT <= SHIFT_CONTENT;
 		--DATA_OUT <= "0100" & cursor;
-		DATA_OUT <= DATA;
+		SENSOR_DATA <= "ZZZZZZZZ";
+		
 	when LOAD_SECOND_4BIT =>
 	
 		NEXT_STATE <= COMPARE;
-		--DATA_OUT <= "1100" & cursor;
 		DATA_OUT <= SHIFT_CONTENT;
-		--DATA_OUT <= DATA;
 		READ_ENABLE <= '0';
 		WRITE_ENABLE <= '0';
 		if cursor = "1111" then
@@ -327,6 +305,7 @@ when READ_CMD =>
 		count_read_enable <= '0';
 		load1 <= '0';
 		load2 <= '1';
+		SENSOR_DATA <= "ZZZZZZZZ";
 		
 	when COMPARE =>
 		if (DATA(3 downto 0) = compare_sg1) and (DATA(7 downto 4) = compare_sg2) then
@@ -346,12 +325,12 @@ when READ_CMD =>
 		cursor_reset <= '0';	
 		DATA_OUT <= SHIFT_CONTENT;
 		DATA_OUT <= DATA;
+		SENSOR_DATA <= "ZZZZZZZZ";
 		
 	when CHECK_CODE =>
 	
 		if cursor = "1111" then
 			NEXT_STATE <= READ_CMD;
-			--next_state <= LOAD;
 		else
 			NEXT_STATE <= MATCH_ROM_READ;
 		end if;
@@ -365,8 +344,8 @@ when READ_CMD =>
 		DATA_OUT <= SHIFT_CONTENT;
 		load1 <= '0';
 		load2 <= '0';
-		--DATA_OUT <= "0110" & cursor;
 		DATA_OUT <= DATA;
+		SENSOR_DATA <= "ZZZZZZZZ";
 ------------------------------------ MATCH ROM END -----------------------------------------------
 
 when REBRANCHING =>
@@ -380,6 +359,7 @@ when REBRANCHING =>
 		load2 <= '0';
 		DATA_OUT <= SHIFT_CONTENT;
 		NEXT_STATE <= LOAD_BIT_ROM;
+		SENSOR_DATA <= "ZZZZZZZZ";
 		
 when LOAD_BIT_ROM =>
 	
@@ -398,11 +378,12 @@ when LOAD_BIT_ROM =>
 		cursor_reset <= '0';
 		load1 <= '0';
 		load2 <= '0';
+		SENSOR_DATA <= "ZZZZZZZZ";
 		
 	when SEND_BIT_ROM =>
 		DATA_OUT <= SHIFT_CONTENT;
 
-		-- Finchè non scrivo pure il complementare rimango qui
+		-- FinchÃ¨ non scrivo pure il complementare rimango qui
 		if count_ack_bit < "10" then
 			if WRITTEN_BIT_ACK = '0' then
 				WRITE_ENABLE <= '1';
@@ -424,11 +405,13 @@ when LOAD_BIT_ROM =>
 		cursor_reset <= '0';
 		load1 <= '0';
 		load2 <= '0';
+		SENSOR_DATA <= "ZZZZZZZZ";
 	when READ_BIT_FROM_MASTER =>
 	
 		WRITE_ENABLE <= '0';
 		DATA_OUT <= SHIFT_CONTENT;
-		if count_read < "111" then
+		--if count_read < "111" then
+		if READ_BYTE_ACK = '0' then
 			if READ_BIT_ACK = '0' then
 				READ_ENABLE <= '1';
 				NEXT_STATE <= READ_BIT_FROM_MASTER;
@@ -442,27 +425,21 @@ when LOAD_BIT_ROM =>
 					NEXT_STATE <= REBRANCHING;
 				end if;
 			end if;
---			cursor_enable <= '0';
 		else
 			count_read_enable <= '1';
 			READ_ENABLE <= '1';
 			if DATA(7) = bit_position_value then
 				NEXT_STATE <= NEXT_ROW;
---				if cursor = "1111" then
---					NEXT_STATE <= READ_CMD;
---				else
---					NEXT_STATE <= LOAD_BIT_ROM;
---				end if;
 			else
 				NEXT_STATE <= IDLE;
 			end if;
---			cursor_enable <= '0';
 		end if;
 		cursor_enable <= '0';
 		count_enable <= '0';
 		cursor_reset <= '0';
 		load1 <= '0';
 		load2 <= '0';
+		SENSOR_DATA <= "ZZZZZZZZ";
 		-- PASSO ALLA NUOVA CELLA DI MEMORIA
 	when NEXT_ROW =>
 		if count_read = "100" then
@@ -485,6 +462,7 @@ when LOAD_BIT_ROM =>
 		cursor_reset <= '0';
 		load1 <= '0';
 		load2 <= '0';
+		SENSOR_DATA <= "ZZZZZZZZ";
 		
 	when WAIT_CLK_FOR_MEM =>
 	
@@ -498,16 +476,12 @@ when LOAD_BIT_ROM =>
 		cursor_reset <= '0';
 		load1 <= '0';
 		load2 <= '0';
-
----- SENSORRRRRRRRRRRRRRRRRRRRRRRRRRRRR
-
-
+		SENSOR_DATA <= "ZZZZZZZZ";
 
 	when others =>
 	
 	DATA_OUT <= SHIFT_CONTENT;
 	READ_ENABLE <= '0';
---	OK_READ <= '0';
 	NEXT_STATE <= IDLE;
 	DATA_OUT <= "00000000";
 		READ_ENABLE <= '0';
@@ -518,9 +492,7 @@ when LOAD_BIT_ROM =>
 		cursor_reset <= '0';
 		load1 <= '0';
 		load2 <= '0';
--- Exception code
--- NS <= ...
--- Y <= ...
+		SENSOR_DATA <= "ZZZZZZZZ";
 end case;
 end process;
 
@@ -533,7 +505,5 @@ elsif( CLK'event and CLK = '1' ) then
 		PRESENT_STATE <= NEXT_STATE;
 end if;
 end process;
-
-
 end Behavioral;
 
