@@ -144,11 +144,11 @@ end if;
 end process;
 
 main_state_machine: process(  RESET_ACK, PRESENCE_ACK, RE,
-										READ_BYTE_ACK, DATA, 
-										PRESENT_STATE, READ_BIT_ACK, 	
-										WRITTEN_BIT_ACK, ROMDATA, 
-										WRITE_ACK, count_ack_bit, SHIFT_CONTENT, bit_position_value, 
-										cursor, count_read, compare_sg1, compare_sg2)
+			READ_BYTE_ACK, DATA, 
+			PRESENT_STATE, READ_BIT_ACK, 	
+			WRITTEN_BIT_ACK, ROMDATA, 
+			WRITE_ACK, count_ack_bit, SHIFT_CONTENT, bit_position_value, 
+			cursor, count_read, compare_sg1, compare_sg2)
 begin
 case PRESENT_STATE is
 
