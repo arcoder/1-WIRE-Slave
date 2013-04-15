@@ -50,7 +50,6 @@ end component;
 
 
 component ResetManager is port(	
---	BUS_1WIRE: in std_logic;
 	MASTER_EDGE_UP:in std_logic;
 	MASTER_EDGE_DOWN:in std_logic;
 	RESET_ACK:out std_logic;
@@ -61,7 +60,6 @@ end component;
 
 component PresenceManager is port(	
 	RESET_ACK:in std_logic;
---	BUS_1WIRE:in std_logic;
 	BUS_1WIRE_OUT:out std_logic;
 	START:out std_logic;
 	CLK:in std_logic;
@@ -72,7 +70,6 @@ end component;
 
 
 component Reader is port(
---	MASTER_EDGE_UP:in std_logic;
 	MASTER_EDGE_DOWN:in std_logic;
 	CLK:in std_logic;
 	RESET:in std_logic;
@@ -93,7 +90,6 @@ component Sequencer is port(
 	DATA_OUT:out std_logic_vector(7 downto 0);
 	CLK: in std_logic;
 	RESET: in std_logic;
---	OK_READ: out std_logic;
 	READ_ENABLE:out std_logic;
 	READ_BIT_ACK: in std_logic;
 	WRITTEN_BIT_ACK: in std_logic;
@@ -110,7 +106,6 @@ component Writer is port(
 	MASTER_EDGE_DOWN:in std_logic;
 	CLK:in std_logic;
 	RESET:in std_logic;
-	--BUS_1WIRE:in std_logic;
 	BUS_1WIRE_OUT:out std_logic;
 	DATA:in std_logic_vector(7 downto 0);
 	DATA_OUT:out std_logic_vector(0 to 7);
@@ -133,10 +128,10 @@ signal bus_in: std_logic;
 signal master_edge_down, master_edge_up: std_logic := '0';
 
 signal data_read: std_logic_vector(7 downto 0) := (others => '0');
-signal mydata   : std_logic_vector(7 downto 0); -- := "11001111";
+signal mydata   : std_logic_vector(7 downto 0);
 signal byte_ack, wbit_ack, rbit_ack, write_enable, reset_manager,  read_byte_enable, write_byte: std_logic := '0';
 
-signal out1, out2, start_communication : std_logic; -- := '0';
+signal out1, out2, start_communication : std_logic; 
 
 
 signal pc: std_logic_vector(3 downto 0);
@@ -148,20 +143,6 @@ begin
 
 bus_in <= to_x01(BUS_INOUT);
 BUS_INOUT <= '0' when (out1 = '1' or out2 = '1') else 'Z';
-
---DATA <= data_read when (RE = '1') else "ZZZZZZZZ";
---DATA <= mydata;
-
---DATA <= write_shift_content;
-
-
--- sensor <= "0000" & SENSOR_IN;
-
-
-
-
-
-
 
 
 
@@ -178,7 +159,6 @@ port map(
 
 U1: ResetManager
 port map( 
---	BUS_1WIRE => BUS_IN, 
 	MASTER_EDGE_UP => master_edge_up, 
 	MASTER_EDGE_DOWN => master_edge_down, 
 	RESET => RESET, 
@@ -188,7 +168,6 @@ port map(
 
 U2: PresenceManager
 port map( 
---	BUS_1WIRE => BUS_IN,
 	BUS_1WIRE_OUT => out1,
 	RESET => RESET, 
 	RESET_ACK => reset_manager,
@@ -199,7 +178,6 @@ port map(
 
 U3: Reader
 port map(
---	MASTER_EDGE_UP => master_edge_up,
 	MASTER_EDGE_DOWN => master_edge_down,
 	CLK => CLK,
 	RESET => RESET,
@@ -227,7 +205,6 @@ port map(
 );
 
 
-
 U5: Sequencer
 port map (
 	RESET_ACK => reset_manager,
@@ -250,6 +227,7 @@ port map (
 	SENSOR_DATA => DATA
 );
 
+
 U6: ROM
 port map (
 	addra => pc,
@@ -257,4 +235,3 @@ port map (
 	clka => CLK
 );
 end Behavioral;
-
