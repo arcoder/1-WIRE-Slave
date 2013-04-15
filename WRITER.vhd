@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------
 -- Company: 
--- Engineer: 
+-- Engineer: Alberto Ruffo
 -- 
 -- Create Date:    10:27:45 02/26/2013 
 -- Design Name: 
@@ -21,14 +21,6 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.all;
 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
 
 entity WRITER is port(
 --	MASTER_EDGE_UP:in std_logic;
@@ -53,8 +45,6 @@ signal count2: std_logic_vector(12 downto 0) := ( others => '0');
 signal shift: std_logic_vector(7 downto 0) := (others => '0');
 signal myack, load_data, count_enable, count2_enable, shift_enable, out_bit, bit_ack: std_logic := '0';
 
---signal mystate : std_logic_vector(2 downto 0) := "000";
-
 signal myout : std_logic := '0';
 
 type STATUS is ( LOAD, WAIT_EDGE, SHIFT_BIT, WRITE_BIT, SEND_ACK);
@@ -66,7 +56,6 @@ begin
 BUS_1WIRE_OUT <= myout;
 WRITTEN_BIT_ACK <= bit_ack;
 
--- BUS_1WIRE_OUT <= myout;
 WRITE_ACK <= myack;
 out_bit <= shift(7);
 DATA_OUT <= shift;
@@ -81,7 +70,6 @@ elsif( CLK'event and CLK = '1' ) then
 	else
 		if shift_enable = '1' then
 			shift <= shift(6 downto 0) & '0';
-			-- out_bit <= shift(0);
 		end if;
 	end if;
 end if;
@@ -93,15 +81,11 @@ begin
 if RESET = '1' then
 	count <= (others => '0');
 elsif CLK'event and CLK = '1' then
---	if WRITE_ENABLE = '1' then
 	if count_enable = '1' then
 		count <= count +1;
 	end if;
-		--count <= (others => '0');
---	end if;
 end if;
 end process;
-
 
 
 counter2: process(CLK, RESET)
@@ -118,17 +102,12 @@ end if;
 end process;
 
 
-
 state: process(CLK, RESET)
 begin
 if RESET = '1' then
 	present_state <= LOAD;
 elsif CLK'event and CLK = '1' then
---	if WE = '1' then
-		present_state <= next_state;
---	else
---		present_state <= LOAD;
---	end if;
+	present_state <= next_state;
 end if;
 end process;
 
@@ -150,16 +129,13 @@ case present_state is
 			shift_enable <= '0';
 			next_state <= LOAD;
 		end if;
-		
-		--next_state <= WAIT_EDGE;
+
 		count_enable <= '0';
-		--shift_enable <= '0';
 		count2_enable <= '0';
 		myack <= '0';
 		myout <= '0';
 		bit_ack <= '0';
-		--mystate <= "001";
-		
+
 	when WAIT_EDGE =>
 		if WE = '1' then
 			if master_edge_down = '1' then
@@ -178,21 +154,7 @@ case present_state is
 		shift_enable <= '0';
 		myack <= '0';
 		myout <= '0';
-		
-		--mystate <= "010";
-		
-	--when SHIFT_BIT =>
 
-	--	load_data <= '0';
-	--	count_enable <= '0';
-	--	count2_enable <= '0';
-	--	shift_enable <= '1';
-	--	next_state <= SEND_ACK;
-	--	myack <= '0';
-	--	myout <= '0';
-		
-	--	mystate <= "011";
-		
 	when WRITE_BIT =>
 		if out_bit = '1' then
 			if count2 < "0000011111010" then
@@ -211,8 +173,7 @@ case present_state is
 				next_state <= SEND_ACK;
 			end if;		
 		end if;
-		
-		--mystate <= "100";
+
 		bit_ack <= '0';	
 		load_data <= '0';		
 		count_enable <= '0';
@@ -220,7 +181,7 @@ case present_state is
 		count2_enable <= '1';
 		myack <= '0';
 
-		
+
 	WHEN SEND_ACK =>
 		if count = "111" then
 			myack <= '1';
@@ -235,11 +196,9 @@ case present_state is
 		shift_enable <= '1';
 		count2_enable <= '0';
 		myout <= '0';
-		
-		--mystate <= "101";
-		
+
 	when others =>
-	
+
 		load_data <= '0';
 		next_state <= LOAD;
 		count_enable <= '0';
@@ -248,9 +207,7 @@ case present_state is
 		myack <= '0';
 		myout <= '0';
 		bit_ack <= '0';
-		--mystate <= "111";
-		
+
 end case;
 end process;
 end Behavioral;
-
