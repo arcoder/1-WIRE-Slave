@@ -55,11 +55,11 @@ begin
 if RESET = '1' then
 	count <= (others => '0');
 elsif CLK'event and CLK = '1' then
-		if count_reset = '0' then
-			count <= count + 1;
-		else
-			count <= (others => '0');
-		end if;
+	if count_reset = '0' then
+		count <= count + 1;
+	else
+		count <= (others => '0');
+	end if;
 end if;
 end process;
 
@@ -71,9 +71,9 @@ if RESET = '1' then
 	count_bit <= (others => '0');
 elsif CLK'event and CLK = '1' then
 	if RE = '1' then
-			if count_bit_enable = '1' then
-				count_bit <= count_bit + 1;
-			end if;
+		if count_bit_enable = '1' then
+			count_bit <= count_bit + 1;
+		end if;
 	else
 		count_bit <= (others => '0');
 	end if;
@@ -86,9 +86,9 @@ begin
 if( RESET = '1' ) then
 	shift <= (others => '0');
 elsif( CLK'event and CLK = '1' ) then
-		if shift_enable = '1' then
-			shift <= BUS_1WIRE & shift(7 downto 1);
-		end if;
+	if shift_enable = '1' then
+		shift <= BUS_1WIRE & shift(7 downto 1);
+	end if;
 end if;
 end process;
 
