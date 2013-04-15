@@ -1,8 +1,6 @@
 ----------------------------------------------------------------------------------
 -- Company: 
--- Engineer: 
--- 
--- Create Date:    00:34:51 12/21/2012 
+-- Engineer: Alberto Ruffo
 -- Design Name: 
 -- Module Name:    Presence - Behavioral 
 -- Project Name: 
@@ -20,20 +18,10 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.all;
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
 
--- Uncomment the following library declaration if instantiating
--- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
 
 entity PresenceManager is port (
 	RESET_ACK:in std_logic;
---	BUS_1WIRE:in std_logic;
---	WRITTEN:out std_logic;
---	NOZERO:out std_logic;
 	BUS_1WIRE_OUT:out std_logic;
 	START:out std_logic;
 	CLK:in std_logic;
@@ -53,12 +41,7 @@ signal write_enable: std_logic := '0';
 
 begin
 
--- DEGUB LED
---WRITTEN <= led;
---NOZERO <= led3;
-
 BUS_1WIRE_OUT <= '1' when write_enable = '1' else '0';
-
 
 process(CLK, RESET)
 begin
@@ -67,7 +50,6 @@ if RESET = '1' then
 elsif CLK'event and CLK='1' then
 	present_state <= next_state;
 end if;
-
 end process;
 
 
@@ -101,7 +83,6 @@ end if;
 end process;
 
 
-
 process(CLK, RESET)
 begin
 if RESET = '1' then
@@ -113,7 +94,6 @@ elsif CLK'event and CLK='1' then
 		count3_debug <= (others => '0');
 	end if;
 end if;
-
 end process;
 
 
@@ -151,8 +131,7 @@ case present_state is
 			write_enable <= '1';
 			START <= '0';
 		end if;
-		
-		
+			
 	when CHECK_BUS_HIGH =>
 		write_enable <= '0';
 		if count3_debug = "000101011110" then
@@ -170,7 +149,5 @@ case present_state is
 
 end case;
 end process;
-
-
 end Behavioral;
 
