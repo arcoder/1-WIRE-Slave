@@ -1,8 +1,7 @@
 ----------------------------------------------------------------------------------
 -- Company: 
--- Engineer: 
+-- Engineer: Alberto Ruffo
 -- 
--- Create Date:    21:31:52 03/05/2013 
 -- Design Name: 
 -- Module Name:    Interface - Behavioral 
 -- Project Name: 
@@ -33,7 +32,8 @@ entity Interface is port(
 BUS_INOUT: inout std_logic;
 RESET:in std_logic;
 CLK:in std_logic;
-DATA: out std_logic_vector(7 downto 0)
+DATA: out std_logic_vector(7 downto 0);
+RE: in std_logic
 );
 end Interface;
 
@@ -100,7 +100,9 @@ component Sequencer is port(
 	WRITE_ENABLE: out std_logic;
 	ADDRA: out std_logic_vector(3 downto 0 );
 	ROMDATA: in std_logic_vector(3 downto 0 );
-	SHIFT_CONTENT: in std_logic_vector(7 downto 0 )
+	SHIFT_CONTENT: in std_logic_vector(7 downto 0 );
+	SENSOR_DATA: out std_logic_vector(7 downto 0 );
+	RE: in std_logic
 );
 end component;
 
@@ -147,7 +149,7 @@ begin
 bus_in <= to_x01(BUS_INOUT);
 BUS_INOUT <= '0' when (out1 = '1' or out2 = '1') else 'Z';
 
-DATA <= "11111111" when data_read = "11001100" else "ZZZZZZZZ";
+--DATA <= data_read when (RE = '1') else "ZZZZZZZZ";
 --DATA <= mydata;
 
 --DATA <= write_shift_content;
@@ -243,7 +245,9 @@ port map (
 	WRITTEN_BIT_ACK => wbit_ack,
 	ADDRA => pc,
 	ROMDATA => rom_data,
-	SHIFT_CONTENT => write_shift_content
+	SHIFT_CONTENT => write_shift_content,
+	RE => RE,
+	SENSOR_DATA => DATA
 );
 
 U6: ROM
