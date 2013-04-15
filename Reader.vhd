@@ -1,8 +1,6 @@
 ----------------------------------------------------------------------------------
 -- Company: 
--- Engineer: 
--- 
--- Create Date:    19:40:15 12/21/2012 
+-- Engineer: Alberto Ruffo
 -- Design Name: 
 -- Module Name:    Reader - Behavioral 
 -- Project Name: 
@@ -21,17 +19,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.all;
 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
 entity Reader is port(
---	MASTER_EDGE_UP:in std_logic;
 	MASTER_EDGE_DOWN:in std_logic;
 	CLK:in std_logic;
 	RESET:in std_logic;
@@ -76,7 +64,6 @@ end if;
 end process;
 
 
-
 count_8_bit: process(CLK, RESET)
 begin
 
@@ -94,7 +81,6 @@ end if;
 end process;
 
 
-
 shift_register: process( CLK, RESET )
 begin
 if( RESET = '1' ) then
@@ -105,7 +91,6 @@ elsif( CLK'event and CLK = '1' ) then
 		end if;
 end if;
 end process;
-
 
 
 process(CLK, RESET)
@@ -121,7 +106,6 @@ elsif CLK'event and CLK='1' then
 end if;
 
 end process;
-
 
 
 process(present_state, BUS_1wire, count, master_edge_down, count_bit)
@@ -140,13 +124,11 @@ case present_state is
 		
 		read_byte_ack_temp <= '0';
 		read_bit_ack_temp <= '0';
-		--count_bit_enable <= '0';
 		shift_enable <= '0';
 		
 	when SAMPLE => 
 		if count = "0010111011100" then
 			shift_enable <= '1';
-			--next_state <= CHECK_IF_IS_READING;
 			next_state <= send_ack;
 		else
 			shift_enable <= '0';
@@ -157,33 +139,6 @@ case present_state is
 		read_byte_ack_temp <= '0';
 		read_bit_ack_temp <= '0';
 		count_bit_enable <= '0';
-		
---	when CHECK_IF_IS_READING =>
---		if count < "0101010001011" then
---			next_state <= CHECK_IF_IS_READING;
---			count_bit_enable <= '0';
---			count_reset <= '0';
---		elsif count >= "0101010001011" and count <= "1011001000011" then
---			if BUS_1WIRE = '1' then
---				next_state <= SEND_ACK;
---				count_bit_enable <= '1';
---			else	
---				next_state <= CHECK_IF_IS_READING;
---				count_bit_enable <= '0';
---			end if;
---			count_reset <= '0';
---		else
-			-- se supero i 120us, probabilmente è partito un reset, faccio gestire tutto
-			-- alla macchina stati principale, mentre qui ritorno in attesa di un nuovo fronte di discesa,
-			-- nel frattempo nella macchina a stati principale, tolgo il RE
---			next_state <= WAITING_EDGE;
---			count_bit_enable <= '0';
---			count_reset <= '1';
---		end if;
-		
---		read_byte_ack_temp <= '0';
---		read_bit_ack_temp <= '0';
---		shift_enable <= '0';
 		
 	when SEND_ACK =>
 	
@@ -197,7 +152,6 @@ case present_state is
 		count_bit_enable <= '0';
 		count_reset <= '0';
 		shift_enable <= '0';
-		
 		next_state <= WAITING_EDGE;	
 		
 	when others =>
@@ -209,8 +163,5 @@ case present_state is
 		shift_enable <= '0';
 end case;
 end process;
-
-
-
 end Behavioral;
 
