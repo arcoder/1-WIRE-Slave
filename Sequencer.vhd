@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------
 -- Company: 
--- Engineer: Alberto Ruffo
+-- Engineer: Alberto Ruffo 
 -- Design Name: 
 -- Module Name:    Sequencer - Behavioral 
 -- Project Name: 
@@ -18,6 +18,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.all;
+
 
 entity Sequencer is port(
 
@@ -55,7 +56,7 @@ architecture Behavioral of Sequencer is
 	signal cursor : std_logic_vector(3 downto 0) := ( others => '0');
 	signal bit_position_value, load1, load2 : std_logic := '0';
 	signal count_ack_bit : std_logic_vector(1 downto 0) := "00";
-	signal count_enable, cursor_enable, cursor_reset, count_read_enable: std_logic := '0';
+	signal count_enable, cursor_enable, cursor_reset, count_read_enable, count_read_reset: std_logic := '0';
 	signal compare_sg1, compare_sg2: std_logic_vector(3 downto 0) := (others => '0');
 	signal count_read : std_logic_vector(2 downto 0) := "000";
 begin
@@ -100,6 +101,10 @@ elsif CLK'event and CLK = '1' then
 			count_read <= count_read + 1;
 		end if;
 	end if;
+	if count_read_reset = '1' then
+		count_read <= (others => '0');
+	end if;
+	--count <= (others => '0');
 end if;
 end process;
 
@@ -160,18 +165,19 @@ case PRESENT_STATE is
 		end if;
 		
 		DATA_OUT <= SHIFT_CONTENT;
+		--DATA_OUT <= DATA;
 		READ_ENABLE <= '0';
 		WRITE_ENABLE <= '0';
 		cursor_enable <= '0';
 		count_enable <= '0';
 	   count_read_enable <= '0';
-		cursor_reset <= '0';
+		count_read_reset <= '1';
+		cursor_reset <= '1';
 		load1 <= '0';
 		load2 <= '0';
 		SENSOR_DATA <= "ZZZZZZZZ";
 		
 when READ_CMD =>
-
 		if RESET_ACK = '0' then
 			if READ_BYTE_ACK = '0' then
 				READ_ENABLE <= '1';
@@ -200,13 +206,13 @@ when READ_CMD =>
 		count_enable <= '0';
 		count_read_enable <= '0';
 		cursor_reset <= '1';
+		count_read_reset <= '1';
 		load1 <= '0';
 		load2 <= '0';
 		DATA_OUT <= SHIFT_CONTENT;
 		SENSOR_DATA <= "ZZZZZZZZ";
 		
 when SENSOR_CMD =>
-
 		if RESET_ACK = '0' then
 			if READ_BYTE_ACK = '0' then
 				READ_ENABLE <= '1';
@@ -224,6 +230,7 @@ when SENSOR_CMD =>
 		count_enable <= '0';
 		count_read_enable <= '0';
 		cursor_reset <= '1';
+		count_read_reset <= '1';
 		load1 <= '0';
 		load2 <= '0';
 		if RE = '1' then
@@ -232,8 +239,8 @@ when SENSOR_CMD =>
 			SENSOR_DATA <= "ZZZZZZZZ";
 		end if;
 		DATA_OUT <= SHIFT_CONTENT;
-
------------------------------------- MATCH ROM START -----------------------------------------------
+	
+------------------------------------ MATCH ROM START ---------------
 
 	when MATCH_ROM_READ =>
 	
@@ -251,7 +258,10 @@ when SENSOR_CMD =>
 		WRITE_ENABLE <= '0';
 		count_enable <= '0';
 		count_read_enable <= '0';
+		count_read_reset <= '0';
 		DATA_OUT <= SHIFT_CONTENT;
+		--DATA_OUT <= "0001" & cursor;
+		--DATA_OUT <= DATA;
 		load1 <= '0';
 		load2 <= '0';
 		SENSOR_DATA <= "ZZZZZZZZ";
@@ -268,15 +278,16 @@ when SENSOR_CMD =>
 		cursor_reset <= '0';
 		count_enable <= '0';
 		count_read_enable <= '0';
+		count_read_reset <= '0';
 		DATA_OUT <= SHIFT_CONTENT;
+		--DATA_OUT <= "0010" & cursor;
 		DATA_OUT <= DATA;
 		SENSOR_DATA <= "ZZZZZZZZ";
 		
 	when INTERMEDIATE =>
-
+		-- CARICO i primi 4 bit della rom, a destra, per poi caricare i secondi a sinistra
 		load1 <= '0';
 		load2 <= '0';
-
 		NEXT_STATE <= LOAD_SECOND_4BIT;
 		
 		READ_ENABLE <= '0';
@@ -285,8 +296,9 @@ when SENSOR_CMD =>
 		cursor_reset <= '0';
 		count_enable <= '0';
 		count_read_enable <= '0';
+		count_read_reset <= '0';
 		DATA_OUT <= SHIFT_CONTENT;
-		--DATA_OUT <= "0100" & cursor;
+		DATA_OUT <= DATA;
 		SENSOR_DATA <= "ZZZZZZZZ";
 		
 	when LOAD_SECOND_4BIT =>
@@ -303,6 +315,7 @@ when SENSOR_CMD =>
 		cursor_reset <= '0';
 		count_enable <= '0';
 		count_read_enable <= '0';
+		count_read_reset <= '0';
 		load1 <= '0';
 		load2 <= '1';
 		SENSOR_DATA <= "ZZZZZZZZ";
@@ -322,6 +335,7 @@ when SENSOR_CMD =>
 		cursor_enable <= '0';
 		count_enable <= '0';
 		count_read_enable <= '0';
+		count_read_reset <= '0';
 		cursor_reset <= '0';	
 		DATA_OUT <= SHIFT_CONTENT;
 		DATA_OUT <= DATA;
@@ -340,6 +354,7 @@ when SENSOR_CMD =>
 		cursor_enable <= '0';
 		count_enable <= '0';
 		count_read_enable <= '0';
+		count_read_reset <= '0';
 		cursor_reset <= '0';	
 		DATA_OUT <= SHIFT_CONTENT;
 		load1 <= '0';
@@ -353,12 +368,13 @@ when REBRANCHING =>
 		READ_ENABLE <= '0';
 		cursor_enable <= '0';
 		count_enable <= '0';
-	   count_read_enable <= '0';
+	   	count_read_enable <= '0';
+		count_read_reset <= '0';
 		cursor_reset <= '0';
 		load1 <= '0';
 		load2 <= '0';
 		DATA_OUT <= SHIFT_CONTENT;
-		NEXT_STATE <= LOAD_BIT_ROM;
+		NEXT_STATE <= IDLE;
 		SENSOR_DATA <= "ZZZZZZZZ";
 		
 when LOAD_BIT_ROM =>
@@ -375,6 +391,7 @@ when LOAD_BIT_ROM =>
 		cursor_enable <= '0';
 		count_enable <= '0';
 	   count_read_enable <= '0';
+		count_read_reset <= '0';
 		cursor_reset <= '0';
 		load1 <= '0';
 		load2 <= '0';
@@ -402,6 +419,7 @@ when LOAD_BIT_ROM =>
 		READ_ENABLE <= '0';
 		cursor_enable <= '0';
 		count_read_enable <= '0';
+		count_read_reset <= '0';
 		cursor_reset <= '0';
 		load1 <= '0';
 		load2 <= '0';
@@ -410,7 +428,6 @@ when LOAD_BIT_ROM =>
 	
 		WRITE_ENABLE <= '0';
 		DATA_OUT <= SHIFT_CONTENT;
-		--if count_read < "111" then
 		if READ_BYTE_ACK = '0' then
 			if READ_BIT_ACK = '0' then
 				READ_ENABLE <= '1';
@@ -437,6 +454,7 @@ when LOAD_BIT_ROM =>
 		cursor_enable <= '0';
 		count_enable <= '0';
 		cursor_reset <= '0';
+		count_read_reset <= '0';
 		load1 <= '0';
 		load2 <= '0';
 		SENSOR_DATA <= "ZZZZZZZZ";
@@ -459,6 +477,7 @@ when LOAD_BIT_ROM =>
 		WRITE_ENABLE <= '0';
 		count_enable <= '0';
 	   count_read_enable <= '0';
+		count_read_reset <= '0';
 		cursor_reset <= '0';
 		load1 <= '0';
 		load2 <= '0';
@@ -471,13 +490,13 @@ when LOAD_BIT_ROM =>
 		WRITE_ENABLE <= '0';
 		READ_ENABLE <= '0';
 		count_enable <= '0';
-	   count_read_enable <= '0';		
+	   count_read_enable <= '0';	
+		count_read_reset <= '0';		
 		cursor_enable <= '0';
 		cursor_reset <= '0';
 		load1 <= '0';
 		load2 <= '0';
 		SENSOR_DATA <= "ZZZZZZZZ";
-
 	when others =>
 	
 	DATA_OUT <= SHIFT_CONTENT;
@@ -489,6 +508,7 @@ when LOAD_BIT_ROM =>
 		cursor_enable <= '0';
 		count_enable <= '0';
 	   count_read_enable <= '0';
+		count_read_reset <= '0';
 		cursor_reset <= '0';
 		load1 <= '0';
 		load2 <= '0';
@@ -505,5 +525,7 @@ elsif( CLK'event and CLK = '1' ) then
 		PRESENT_STATE <= NEXT_STATE;
 end if;
 end process;
+
+
 end Behavioral;
 
