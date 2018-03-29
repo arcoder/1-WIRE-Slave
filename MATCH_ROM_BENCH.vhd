@@ -44,7 +44,8 @@ ARCHITECTURE behavior OF MATCH_ROM_BENCH IS
          BUS_INOUT : INOUT  std_logic;
          RESET : IN  std_logic;
          CLK : IN  std_logic;
-         DATA : OUT  std_logic_vector(7 downto 0)
+         DATA : OUT  std_logic_vector(7 downto 0);
+         RE   : IN   std_logic
         );
     END COMPONENT;
     
@@ -69,7 +70,8 @@ BEGIN
           BUS_INOUT => BUS_INOUT,
           RESET => RESET,
           CLK => CLK,
-          DATA => DATA
+          DATA => DATA,
+          RE   => '1'
         );
 
    -- Clock process definitions
